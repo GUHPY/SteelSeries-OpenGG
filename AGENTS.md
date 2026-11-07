@@ -154,3 +154,32 @@ Os sites ficam na HostGator (cPanel › Git Version Control). Cada site é um cl
 | `betterlandingco.com` | `main` | Better Landing |
 | `brandmydiploma.com`, `brandmydegree.com` | `main` | Brand My Diploma |
 | `thedoctorlogos.com`, `thedrlogos.com`, `thedrbrands.com` | `main` | Dr Logos (fora deste workspace) |
+
+---
+
+## Plano de implementação em `docs/plans/` (para o próximo agente)
+
+### Quando escrever
+- Pedido com **várias alterações** (vários arquivos, várias etapas, ou trabalho que pode não caber numa sessão): escreva o plano **antes** de codar.
+- Pedido simples (uma correção, um ajuste de texto, uma linha): **não** escreva plano. A decisão é do agente.
+
+### Onde
+- Todo repositório tem `docs/` e, dentro dela, `docs/plans/`. Se a pasta de docs já existe com outro nome de caixa (ex.: `Docs/` no Parallel e no Luz), use a que existe: `Docs/plans/`.
+- Um arquivo por tarefa: `docs/plans/AAAA-MM-DD-<assunto-curto>.md`. Tarefa que continua: atualize o mesmo arquivo, não crie outro.
+- Isto vale no lugar do caminho de exemplo do §7.1 (`Docs/<área>/ativo/...`). Planos antigos ficam onde estão; não mova. Se outra regra deste arquivo disser para não commitar planos, esta vale (decisão do dono).
+- `docs/` guarda também os outros documentos importantes do projeto, cada tipo na sua subpasta: `docs/instructions/` (como rodar, publicar, operar), `docs/specs/` (arquitetura e decisões), `docs/research/` (pesquisas e comparativos), e o que mais o projeto precisar. Não espalhe documentos soltos na raiz.
+
+### Como (rápido e barato)
+- Escreva em poucos minutos e com poucas palavras: o plano é para outro agente retomar, não para ler bonito. Nada de copiar código, repetir o pedido inteiro ou explicar o óbvio.
+- Mas com detalhe suficiente para o próximo agente **comparar o plano com os arquivos** e saber o que já foi feito e o que falta. Modelo:
+  ```markdown
+  # <assunto> (AAAA-MM-DD)
+  Pedido: <1–3 linhas com as palavras do dono>
+  Decisões: <o que foi escolhido e por quê, 1 linha cada>
+  ## Fases
+  - [ ] F1 <o quê> — arquivos: `a.ts`, `b.css` — aceite: <como provar que ficou pronto>
+  - [ ] F2 ...
+  ## Estado
+  <onde parou, commits (hash), o que ficou de fora e por quê>
+  ```
+- Marque `- [x]` ao fim de cada fase e atualize **Estado** antes de encerrar a sessão. O plano vai no commit da tarefa.
