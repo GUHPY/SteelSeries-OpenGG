@@ -113,3 +113,44 @@ Toda tarefa que não seja trivial (mais de um arquivo ou mais de um passo) segue
 - Se o trabalho está numa branch que não é a `main`, faça o merge na `main` em seguida (`git checkout main && git merge --no-ff <branch> && git push origin main`) e volte para a branch.
 - O espelho no DevLogs segue a mesma regra: um commit e um push por tarefa.
 - Conflito no merge: resolva sem descartar o trabalho de ninguém. Se não der para resolver com segurança, pare e avise o dono antes de forçar qualquer coisa.
+
+---
+
+## Deploy na HostGator: "Update from Remote" por SSH
+
+Os sites ficam na HostGator (cPanel › Git Version Control). Cada site é um clone de um repositório do GitHub numa branch. O botão **Update from Remote** do cPanel só faz o servidor puxar essa branch do GitHub. Por SSH, o agente roda o mesmo comando.
+
+### Regra padrão: NÃO fazer o update a cada alteração
+- Por padrão, o dono **não** quer um Update from Remote depois de toda alteração. Commit e push seguem o protocolo normal deste arquivo; o update, não.
+- Só rode o update quando o dono **pedir para aquela sessão** (ex.: "nesta sessão, depois de commitar, dá o update") ou disser **claramente** que é para fazer. Na dúvida, não rode: avise no fim que o site só muda depois do update.
+- Pedido de uma sessão não vale para a próxima.
+
+### Acesso
+- Atalho já configurado em `C:\Users\gugac\.ssh\config`: `ssh hostgator` (chave `C:\Users\gugac\.ssh\hostgator`, ed25519, sem senha, autorizada no cPanel). IP e usuário moram só nesse config, nunca em repositório.
+- Nunca use a chave `id_rsa (cPanel)` nem senha nenhuma; nunca leia nem repita o arquivo `senha id_rsa (cPanel).txt`.
+- O domínio dos sites passa pela Cloudflare: SSH sempre pelo atalho `hostgator`, nunca pelo domínio.
+- Teste: `ssh -o BatchMode=yes hostgator 'echo ok'`.
+
+### Como fazer (sempre nesta ordem)
+1. Commit e **push** para a branch que o cPanel acompanha. O update puxa do GitHub: sem push, nada muda no site.
+2. Descobrir a pasta e a branch do site. **Atenção:** a saída crua do `retrieve` mostra a URL do GitHub com token; nunca imprima nem copie essa saída, filtre assim:
+   ```bash
+   ssh hostgator 'uapi --output=json VersionControl retrieve' | python -c "import sys,json;[print(r['repository_root'],r['branch']) for r in json.load(sys.stdin)['result']['data']]"
+   ```
+3. Rodar o update (o mesmo do botão) e conferir que `status` é 1 e que o commit é o que você empurrou:
+   ```bash
+   ssh hostgator 'uapi --output=json VersionControl update repository_root=/home4/<usuario>/<dominio> branch=<branch>' | python -c "import sys,json;r=json.load(sys.stdin)['result'];print(r['status'],r['errors'],(r['data'] or {}).get('last_update',{}).get('identifier'))"
+   ```
+   O `<usuario>` aparece no `repository_root` do passo 2.
+- Só atualize o site do projeto em que você está trabalhando. Nunca mexa nos repositórios dos outros sites da conta.
+
+### Sites da conta (07/11/2026)
+| Pasta no servidor | Branch | Projeto |
+| --- | --- | --- |
+| `devdesignlibrary.com` | `site` | Parallel (DDL), worktree `Parallel Canvas/ddl-site` |
+| `luz.gg` | `site` | Luz |
+| `econographs.com` | `site` | Econographs |
+| `appduobot.com` | `site` | Duobot |
+| `betterlandingco.com` | `main` | Better Landing |
+| `brandmydiploma.com`, `brandmydegree.com` | `main` | Brand My Diploma |
+| `thedoctorlogos.com`, `thedrlogos.com`, `thedrbrands.com` | `main` | Dr Logos (fora deste workspace) |
